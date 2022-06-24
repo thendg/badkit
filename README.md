@@ -1,2 +1,2 @@
-# badkit
-Blender Addon Development Kit - A proper addon development framework for Blender
+# BADKit
+Blender Addon Development Kit. A proper framework for addon development in Blender.
