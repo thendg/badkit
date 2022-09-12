@@ -1,4 +1,3 @@
-import os
 import subprocess
 
 import click
@@ -19,17 +18,14 @@ from . import bootloader
     type=click.Path(dir_okay=False, exists=True),
     help="A path to a file that should be opened on launch.",
 )
-@click.option(
-    "--addons",
+@click.argument(
+    "addons",
     type=click.Path(file_okay=False, exists=True),
     nargs=-1,
-    help="A list of paths to addon bundles.",
 )
 def launch(blender: str, file: click.Path, addons: list[click.Path]) -> None:
     """
-    Launch a Blender environment with a specified set of custom addons installed and enabled.
-
-    The --addons option should be specified last since all following tokens will be collected into it's value
+    Launch a Blender environment with a set of custom addons (specified in ADDONS) installed and enabled. ADDONS should be specified last since all following tokens will be collected into it's value.
     """
 
     subprocess.run(
