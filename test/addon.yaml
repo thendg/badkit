@@ -1,0 +1,31 @@
+!Addon
+bl_info: !BLInfo
+  name: Cubez Blender Pack
+  description: A collection of helpers designed by the Cubez.io team for development in Blender
+  author: NOIR Development Group
+  addon_version: [1, 0, 0]
+  blender_version: [3, 1, 0]
+  warning: This is an ALPHA version of the Cubez Blender Pack
+  doc_url: https://github.com/thendg/cubez-packages#readme
+  tracker_url: https://github.com/thendg/cubez-packages/issues
+  support: COMMUNITY
+  category: "CBP"
+packages:
+  - !Package
+    name: material_marshall
+    panel: !Panel
+      label: Material Marshall (MM)
+      space: VIEW3D
+    blend:
+      - !Blend
+        name: nodes.blend
+        NodeGroups:
+          - glTF Settings
+  - !Package
+    name: prodedural_displacement_baker
+    panel: !Panel
+      label: Procedural Displacement Baker (PDB)
+      space: VIEW3D
+  - !Package
+    name: exporter
+    panel: bl_ui.space_topbar.TOPBAR_MT_file_export
