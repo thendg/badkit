@@ -4,7 +4,7 @@ import zipfile
 import click
 import yaml
 
-from . import descriptors
+from . import consts, descriptors
 
 for descriptor in descriptors.CLASSES:
     yaml.SafeLoader.add_constructor(descriptor.yaml_tag, descriptor.from_yaml)
@@ -33,26 +33,40 @@ def build(
 ) -> None:
     """Build an addon bundle from a specified source directory."""
 
+    addon_path = os.path.abspath(addon_path)
+    addon_dir = os.path.dirname(addon_path)
+    os.chdir(addon_dir)
     addon: descriptors.addon.Addon = None
     with open(addon_path, "r") as addon_file:
+        os.chdir(os.path.join(addon_dir, consts.SRC))
         addon = yaml.safe_load(addon_file)
-
-    os.chdir(addon.name)
 
     # Prepare names/paths
     build_path = output + ".zip"
-
+    print(os.path.abspath(build_path))
     # Delete old bundle
     if os.path.exists(build_path):
         os.remove(build_path)
     else:
         os.makedirs(os.path.dirname(output), exist_ok=True)
 
-    # TODO: add custom __init__.py to addon bundle
-
     # Create archive
     with zipfile.ZipFile(build_path, "w") as bundle:
-        for file in include:
-            bundle.write(file, arcname=os.path.join(name, file))
+        for operator_package in addon.operator_packagess:
+            bundle_write = lambda name: bundle.write(
+                os.path.join(addon_dir, consts.SRC, operator_package.name, name),
+                arcname=os.path.join(operator_package.name, name),
+            )
+            bundle_write("operator.py")
+            if operator_package.properties:
+                bundle_write("properties.py")
+            if operator_package.blend:
+                for _, _, files in os.walk(
+                    os.path.join(operator_package.name, "blend")
+                ):
+                    for blend in files:
+                        bundle_write(blend)
+        # TODO: copy __init__.py file into bundle
+        # TODO: append blend data into Blender env on registration, remove un unregister
 
     print(f'Bundle built to "{build_path}".\n')

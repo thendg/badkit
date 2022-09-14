@@ -1,11 +1,9 @@
 from typing import Literal
 
-import yaml
-
-from . import package
+from . import operator_package, serializable
 
 
-class BLInfo(yaml.YAMLObject):
+class BLInfo(serializable.Serializable):
     yaml_tag = "!BLInfo"
 
     """A class to represent the metadata for a Blender addon."""
@@ -45,12 +43,34 @@ class BLInfo(yaml.YAMLObject):
             "support": self.support,
         }
 
+    @classmethod
+    def get_attrs(cls) -> tuple[str, ...]:
+        return (
+            "name",
+            "description",
+            "author",
+            "addon_version",
+            "blender_version",
+            "warning",
+            "doc_url",
+            "tracker_url",
+            "support",
+        )
 
-class Addon(yaml.YAMLObject):
+
+class Addon(serializable.Serializable):
     yaml_tag = "!Addon"
 
     """A class representing an entire Blender addon."""
 
-    def __init__(self, bl_info: BLInfo, packages: list[package.Package]) -> None:
+    def __init__(
+        self,
+        bl_info: BLInfo,
+        operator_packagess: list[operator_package.OperatorPackage],
+    ) -> None:
         self.bl_info = bl_info
-        self.packages = packages
+        self.operator_packagess = operator_packagess
+
+    @classmethod
+    def get_attrs(cls) -> tuple[str, ...]:
+        return "bl_info", "operator_packagess"

@@ -3,13 +3,13 @@ from typing import Type
 import yaml
 
 from .addon import Addon, BLInfo
-from .package import PanelData, BlendData, Package
+from .operator_package import PanelData, BlendData, OperatorPackage
 
 CLASSES: set[Type[yaml.YAMLObject]] = {
     Addon,
     BLInfo,
-    Package,
+    OperatorPackage,
     PanelData,
     BlendData,
-    Package,
+    OperatorPackage,
 }

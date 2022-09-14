@@ -6,12 +6,12 @@ bl_info: !BLInfo
   addon_version: [1, 0, 0]
   blender_version: [3, 1, 0]
   warning: This is an ALPHA version of the Cubez Blender Pack
-  doc_url: https://github.com/thendg/cubez-packages#readme
-  tracker_url: https://github.com/thendg/cubez-packages/issues
+  doc_url: https://github.com/thendg/cubez-blender-pack#readme
+  tracker_url: https://github.com/thendg/cubez-blender-pack/issues
   support: COMMUNITY
   category: "CBP"
-packages:
-  - !Package
+operator_packages:
+  - !OperatorPackage
     name: material_marshall
     panel: !Panel
       label: Material Marshall (MM)
@@ -19,13 +19,13 @@ packages:
     blend:
       - !Blend
         name: nodes.blend
-        NodeGroups:
+        node_groups:
           - glTF Settings
-  - !Package
-    name: prodedural_displacement_baker
+  - !OperatorPackage
+    name: procedural_displacement_baker
     panel: !Panel
       label: Procedural Displacement Baker (PDB)
       space: VIEW3D
-  - !Package
+  - !OperatorPackage
     name: exporter
     panel: bl_ui.space_topbar.TOPBAR_MT_file_export
