@@ -162,4 +162,3 @@ cython_debug/
 
 .vscode
 test
-!test/addon.yaml

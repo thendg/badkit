@@ -1,4 +1,3 @@
-from genericpath import exists
 import importlib
 import os
 import re
@@ -208,7 +207,7 @@ class Addon(Serializable):
 
     @classmethod
     def get_attrs(cls) -> tuple[str, ...]:
-        return "bl_info", "operator_packages", "blend"
+        return "bl_info", "operators", "blend"
 
 
 DESCRIPTOR_CLASSES: set[Type[yaml.YAMLObject]] = {

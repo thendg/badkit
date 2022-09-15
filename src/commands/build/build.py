@@ -60,12 +60,18 @@ def build(
             ),
             arcname="__init__.py",
         )
-        for root, _, files in os.walk(os.path.join(addon_dir, consts.BLEND)):
+        for root, _, files in os.walk(
+            os.path.join(addon_dir, consts.SRC, consts.BLEND)
+        ):
             for file in files:
                 bundle.write(
                     os.path.join(addon_dir, consts.BLEND, root, file),
                     arcname=os.path.join(root, file),
                 )
+        # TODO: Can't pickle <class 'src.commands.build.descriptors.MMOperatorPanel'>: attribute lookup MMOperatorPanel on src.commands.build.descriptors failed
+        # the type() constructor used in src.build.descriptors:165 assigns the generated Panel type to the descriptors module, rather than the operator that the panel belongs to
+        # this is why the error says it <class 'src.commands.build.descriptors.MMOperatorPanel'> instead of <class 'src.commands.build.descriptors.Operator.MMOperatorPanel'>
+        # research here: https://stackoverflow.com/questions/4677012/python-cant-pickle-type-x-attribute-lookup-failed
         bundle.writestr("classes.pkl", pickle.dumps(addon.get_classes()))
         bundle.writestr("blend.pkl", pickle.dumps(addon.blend))
 

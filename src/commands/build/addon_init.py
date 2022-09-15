@@ -1,27 +1,21 @@
-# TODO: load classes.pkl
-# TODO: append blend data into Blender env on registration, remove un unregister
-
 from typing import Callable, Type
 
 import bpy
 from bpy.props import PointerProperty
 from bpy.types import Context, Menu, PropertyGroup, Scene
 
-from .utils.registration import Registerable, RegistrationInfo
+from ...wrappers import registerable
 
 # dictionary of operators to their draw functions
-menu_funcs: dict[Type[Registerable], Callable[[Menu, Context], None]] = {}
+menu_funcs: dict[Type[registerable.Registerable], Callable[[Menu, Context], None]] = {}
 
 
-def get_addon_classes() -> tuple[Type[Registerable]]:
-    classes = []
+def get_addon_classes() -> tuple[Type[registerable.Registerable]]:
+    # TODO: load and return classes.pkl
+    pass
 
-    for reg_info in ADDON_MODULES:
-        classes.append(reg_info.operator)
-        classes += [reg_info.properties] if reg_info.properties else []
-        classes += [reg_info.panel] if reg_info.panel else []
 
-    return tuple(classes)
+# TODO: append blend data into Blender env on registration, remove un unregister
 
 
 def register():
