@@ -1,4 +1,5 @@
 import os
+import pickle
 import zipfile
 
 import click
@@ -6,7 +7,7 @@ import yaml
 
 from . import consts, descriptors
 
-for descriptor in descriptors.CLASSES:
+for descriptor in descriptors.DESCRIPTOR_CLASSES:
     yaml.SafeLoader.add_constructor(descriptor.yaml_tag, descriptor.from_yaml)
 
 
@@ -36,7 +37,7 @@ def build(
     addon_path = os.path.abspath(addon_path)
     addon_dir = os.path.dirname(addon_path)
     os.chdir(addon_dir)
-    addon: descriptors.addon.Addon = None
+    addon: descriptors.Addon = None
     with open(addon_path, "r") as addon_file:
         os.chdir(os.path.join(addon_dir, consts.SRC))
         addon = yaml.safe_load(addon_file)
@@ -52,21 +53,20 @@ def build(
 
     # Create archive
     with zipfile.ZipFile(build_path, "w") as bundle:
-        for operator_package in addon.operator_packagess:
-            bundle_write = lambda name: bundle.write(
-                os.path.join(addon_dir, consts.SRC, operator_package.name, name),
-                arcname=os.path.join(operator_package.name, name),
-            )
-            bundle_write("operator.py")
-            if operator_package.properties:
-                bundle_write("properties.py")
-            if operator_package.blend:
-                for _, _, files in os.walk(
-                    os.path.join(operator_package.name, "blend")
-                ):
-                    for blend in files:
-                        bundle_write(blend)
-        # TODO: copy __init__.py file into bundle
-        # TODO: append blend data into Blender env on registration, remove un unregister
+        bundle.write(
+            os.path.join(
+                os.path.dirname(__file__),
+                "addon_init.py",
+            ),
+            arcname="__init__.py",
+        )
+        for root, _, files in os.walk(os.path.join(addon_dir, consts.BLEND)):
+            for file in files:
+                bundle.write(
+                    os.path.join(addon_dir, consts.BLEND, root, file),
+                    arcname=os.path.join(root, file),
+                )
+        bundle.writestr("classes.pkl", pickle.dumps(addon.get_classes()))
+        bundle.writestr("blend.pkl", pickle.dumps(addon.blend))
 
     print(f'Bundle built to "{build_path}".\n')

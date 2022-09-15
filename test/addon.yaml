@@ -10,22 +10,22 @@ bl_info: !BLInfo
   tracker_url: https://github.com/thendg/cubez-blender-pack/issues
   support: COMMUNITY
   category: "CBP"
-operator_packages:
-  - !OperatorPackage
+operators:
+  - !Operator
+    name: exporter
+    # panel: bl_ui.space_topbar.TOPBAR_MT_file_export
+  - !Operator
     name: material_marshall
     panel: !Panel
       label: Material Marshall (MM)
       space: VIEW3D
-    blend:
-      - !Blend
-        name: nodes.blend
-        node_groups:
-          - glTF Settings
-  - !OperatorPackage
+  - !Operator
     name: procedural_displacement_baker
     panel: !Panel
       label: Procedural Displacement Baker (PDB)
       space: VIEW3D
-  - !OperatorPackage
-    name: exporter
-    panel: bl_ui.space_topbar.TOPBAR_MT_file_export
+blend:
+  - !Blend
+    name: material_marshall
+    node_groups:
+      - glTF Settings

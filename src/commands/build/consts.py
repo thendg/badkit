@@ -1,1 +1,2 @@
 SRC = "src"
+BLEND = "blend"
