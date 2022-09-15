@@ -20,8 +20,9 @@ def import_class(package: str, module: str, super_name: str):
         raise FileNotFoundError(f"Failed to locate {package}.{module} at {mod_path}")
     cls: str = None
     with open(mod_path, "r") as mod_file:
-        # TODO: following test will fail if they have class MyOperator(badkit.BADKitOperator):
-        match = re.search(f"(?<=class )\w*(?=\({super_name}\):)", mod_file.read())
+        match = re.search(
+            f"(?<=class )\w*(?=\((\w\.?)*\.?({super_name})\):)", mod_file.read()
+        )
         if not match:
             raise ImportError(
                 f"Failed to locate a subclass of {super_name} in {package}.{module} at {mod_path}"
@@ -125,7 +126,7 @@ class Operator(Serializable):
     def __init__(
         self,
         name: str,
-        panel: Optional[Panel] = None,
+        panel: Optional[Panel | str] = None,
     ) -> None:
         """
         Construct a Package object.
@@ -148,9 +149,7 @@ class Operator(Serializable):
         except FileNotFoundError:
             self.properties = None
 
-        # TODO: how does BQDM exporter panel work? panel: bl_ui.space_topbar.TOPBAR_MT_file_export
-        # TODO: we need to use the actual classes before we can continue, we cant use dummies forever
-        if panel:
+        if panel and isinstance(panel, Panel):
             if not self.properties:
                 raise FileNotFoundError(
                     f"Panel generation was attempted but there are no properties defined for the operator {self.operator.bl_idname}."
