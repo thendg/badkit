@@ -5,51 +5,43 @@ import zipfile
 import click
 import yaml
 
-from . import consts, descriptors
+from .. import logger
+from . import descriptors
+
+SRC = "src"
+BLEND = "blend"
+ADDON = "addon.yaml"
+BUILD = "build"
 
 for descriptor in descriptors.DESCRIPTOR_CLASSES:
     yaml.SafeLoader.add_constructor(descriptor.yaml_tag, descriptor.from_yaml)
 
 
 @click.command()
-@click.option(
-    "-a",
-    "--addon-path",
-    type=click.Path(exists=True, dir_okay=False),
-    default="./src/addon.yaml",
-    help="The path to the source directory of the addon.",
-    show_default=True,
-)
-@click.option(
-    "-o",
-    "--output",
-    type=click.Path(file_okay=False),
-    default="./build",
-    help="The path of the containing directory to write the addon bundle to.",
-    show_default=True,
-)
-def build(
-    addon_path: click.Path,
-    output: click.Path,
-) -> None:
+def build() -> None:
     """Build an addon bundle from a specified source directory."""
 
-    addon_path = os.path.abspath(addon_path)
-    addon_dir = os.path.dirname(addon_path)
-    os.chdir(addon_dir)
+    src_dir = os.path.abspath("test/" + SRC)
+    addon_path = os.path.abspath("test/" + ADDON)
+    if not os.path.exists(addon_path):
+        raise FileNotFoundError(f"Failed to find {ADDON}.")
+
     addon: descriptors.Addon = None
     with open(addon_path, "r") as addon_file:
-        os.chdir(os.path.join(addon_dir, consts.SRC))
+        cwd = os.getcwd()
+        os.chdir(src_dir)
         addon = yaml.safe_load(addon_file)
+        os.chdir(cwd)
 
     # Prepare names/paths
-    build_path = output + ".zip"
-    print(os.path.abspath(build_path))
-    # Delete old bundle
+    build_dir = os.path.abspath(BUILD)
+    build_path = f"{build_dir}{os.path.sep}{addon.bl_info.name}.zip".replace(
+        " ", "-"
+    ).lower()
     if os.path.exists(build_path):
         os.remove(build_path)
-    else:
-        os.makedirs(os.path.dirname(output), exist_ok=True)
+    if not os.path.exists(build_dir):
+        os.makedirs(build_dir, exist_ok=True)
 
     # Create archive
     with zipfile.ZipFile(build_path, "w") as bundle:
@@ -60,12 +52,10 @@ def build(
             ),
             arcname="__init__.py",
         )
-        for root, _, files in os.walk(
-            os.path.join(addon_dir, consts.SRC, consts.BLEND)
-        ):
+        for root, _, files in os.walk(os.path.join(src_dir, BLEND)):
             for file in files:
                 bundle.write(
-                    os.path.join(addon_dir, consts.BLEND, root, file),
+                    os.path.join(src_dir, BLEND, root, file),
                     arcname=os.path.join(root, file),
                 )
         # TODO: Can't pickle <class 'src.commands.build.descriptors.MMOperatorPanel'>: attribute lookup MMOperatorPanel on src.commands.build.descriptors failed
@@ -75,4 +65,8 @@ def build(
         bundle.writestr("classes.pkl", pickle.dumps(addon.get_classes()))
         bundle.writestr("blend.pkl", pickle.dumps(addon.blend))
 
-    print(f'Bundle built to "{build_path}".\n')
+    logger.log(
+        f'Bundle built to "{os.path.abspath(build_path)}"\n',
+        fg="white",
+        bold=True,
+    )

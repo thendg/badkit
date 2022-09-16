@@ -13,7 +13,7 @@ from ... import wrappers
 
 
 def import_class(package: str, module: str, super_name: str):
-    # TODO: this function currently assumes to be running in src dir
+    # TODO: document that does imports relative to cwd
     mod_path = os.path.abspath(os.path.join(package, module + ".py"))
     if not os.path.exists(mod_path):
         raise FileNotFoundError(f"Failed to locate {package}.{module} at {mod_path}")
@@ -153,8 +153,8 @@ class Operator(Serializable):
                 raise FileNotFoundError(
                     f"Panel generation was attempted but there are no properties defined for the operator {self.operator.bl_idname}."
                 )
-            self.panel: wrappers.BADKitPanel = type(
-                self.operator.__name__ + "Panel",
+            generated_panel: wrappers.BADKitPanel = type(
+                f"{self.operator.__name__}Panel",
                 (wrappers.BADKitPanel,),
                 {
                     "bl_label": self.operator.bl_label,
@@ -165,6 +165,8 @@ class Operator(Serializable):
                     "props": self.properties,
                 },
             )
+            globals()[generated_panel.__name__] = generated_panel
+            self.panel = generated_panel
         else:
             self.panel = panel
 
