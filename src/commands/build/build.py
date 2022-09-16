@@ -5,7 +5,7 @@ import zipfile
 import click
 import yaml
 
-from .. import logger
+from .. import utils
 from . import descriptors
 
 SRC = "src"
@@ -21,10 +21,10 @@ for descriptor in descriptors.DESCRIPTOR_CLASSES:
 def build() -> None:
     """Build an addon bundle from a specified source directory."""
 
-    src_dir = os.path.abspath("test/" + SRC)
-    addon_path = os.path.abspath("test/" + ADDON)
+    src_dir = os.path.abspath(SRC)
+    addon_path = os.path.abspath(ADDON)
     if not os.path.exists(addon_path):
-        raise FileNotFoundError(f"Failed to find {ADDON}.")
+        raise FileNotFoundError(f"Failed to find {addon_path}.")
 
     addon: descriptors.Addon = None
     with open(addon_path, "r") as addon_file:
@@ -58,15 +58,14 @@ def build() -> None:
                     os.path.join(src_dir, BLEND, root, file),
                     arcname=os.path.join(root, file),
                 )
-        # TODO: Can't pickle <class 'src.commands.build.descriptors.MMOperatorPanel'>: attribute lookup MMOperatorPanel on src.commands.build.descriptors failed
-        # the type() constructor used in src.build.descriptors:165 assigns the generated Panel type to the descriptors module, rather than the operator that the panel belongs to
-        # this is why the error says it <class 'src.commands.build.descriptors.MMOperatorPanel'> instead of <class 'src.commands.build.descriptors.Operator.MMOperatorPanel'>
-        # research here: https://stackoverflow.com/questions/4677012/python-cant-pickle-type-x-attribute-lookup-failed
+        # TODO: check that bundle is correct
+        # TODO: copy utils into bundle
+        # TODO: copy wrappers into bundle
         bundle.writestr("classes.pkl", pickle.dumps(addon.get_classes()))
         bundle.writestr("blend.pkl", pickle.dumps(addon.blend))
 
-    logger.log(
-        f'Bundle built to "{os.path.abspath(build_path)}"\n',
+    utils.log(
+        f'Bundle built to "{os.path.abspath(build_path)}"',
         fg="white",
         bold=True,
     )
