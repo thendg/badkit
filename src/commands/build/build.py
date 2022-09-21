@@ -1,12 +1,12 @@
 import os
 import pickle
-from typing import Any, Callable, TypeVar
+from typing import Callable, TypeVar
 import zipfile
 
 import click
 import yaml
 
-from .. import utils
+from .. import utils as cmd_utils
 from . import descriptors
 from ... import utils as badkit_utils, wrappers as badkit_wrappers
 
@@ -91,7 +91,7 @@ def build() -> None:
         bundle.writestr("classes.pkl", pickle.dumps(addon.get_classes()))
         bundle.writestr("blend.pkl", pickle.dumps(addon.blend))
 
-    utils.log(
+    cmd_utils.log(
         f'Bundle built to "{os.path.abspath(build_path)}"',
         fg="white",
         bold=True,
