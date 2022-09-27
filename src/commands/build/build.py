@@ -1,5 +1,6 @@
 import os
 import pickle
+from types import ModuleType
 from typing import Callable, TypeVar
 import zipfile
 
@@ -71,22 +72,22 @@ def build() -> None:
         bundle.write(
             os.path.join(
                 os.path.dirname(__file__),
-                "addon_init.py",
+                "initializer.py",
             ),
             arcname="__init__.py",
         )
 
         run_in_dir(SRC, lambda: copy_to_zipf(bundle, BLEND))
         copy_badkit_module_to_bundle: Callable[
-            [str], None
-        ] = lambda filename: run_in_dir(
-            os.path.dirname(os.path.dirname(filename)),
+            [ModuleType], None
+        ] = lambda module: run_in_dir(
+            os.path.dirname(os.path.dirname(module.__file__)),
             lambda: copy_to_zipf(
-                bundle, os.path.basename(os.path.dirname(filename)), prefix="badkit"
+                bundle, os.path.basename(os.path.dirname(module.__file__)), prefix="badkit"
             ),
         )
-        copy_badkit_module_to_bundle(badkit_utils.__file__)
-        copy_badkit_module_to_bundle(badkit_wrappers.__file__)
+        copy_badkit_module_to_bundle(badkit_utils)
+        copy_badkit_module_to_bundle(badkit_wrappers)
 
         bundle.writestr("classes.pkl", pickle.dumps(addon.get_classes()))
         bundle.writestr("blend.pkl", pickle.dumps(addon.blend))
