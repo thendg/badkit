@@ -1,3 +1,4 @@
+import os
 from typing import Any, Callable, Type
 import pickle
 
@@ -24,8 +25,14 @@ def register():
     "Register classes and append them to their associated menus."
 
     for blend in unpickle("blend"):
-        # TODO: append blend data into current file
-        ...
+        for group in blend.node_groups:
+            blend_file_path = os.path.join("blend", blend.name)
+            # TODO: add the object_name
+            bpy.ops.wm.append(
+                filepath=os.path.join(blend_file_path, group, object_name),
+                directory=os.path.join(blend_file_path, group),
+                filename=object_name,
+            )
 
     for cls in CLASSES:
         bpy.utils.register_class(cls)

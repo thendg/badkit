@@ -178,8 +178,9 @@ class Operator(Serializable):
 class Blend(Serializable):
     yaml_tag = "!Blend"
 
-    def __init__(self, name: str, node_groups: list[str]) -> None:
+    def __init__(self, name: str, node_groups: list[list[str]]) -> None:
         self.name = name
+        # TOOD: conv inner groups to tuple
         self.node_groups = tuple(node_groups)
 
     @classmethod
